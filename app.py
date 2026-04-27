@@ -23,7 +23,6 @@ def conectar():
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-
     if request.method == "POST":
         fecha = request.form["fecha"]
         entrada = request.form["entrada"]
