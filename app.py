@@ -5,6 +5,7 @@ import os
 
 app = Flask(__name__)
 
+# Base de datos (Render solo permite escribir en /tmp)
 DB = os.path.join("/tmp", "horario.db")
 
 
@@ -23,6 +24,8 @@ def conectar():
 
 @app.route("/", methods=["GET", "POST"])
 def index():
+
+    # ----- GUARDAR NUEVO HORARIO -----
     if request.method == "POST":
         fecha = request.form["fecha"]
         entrada = request.form["entrada"]
@@ -46,13 +49,21 @@ def index():
 
         return redirect("/")
 
+    # ----- MOSTRAR DATOS -----
     con = conectar()
     datos = con.execute(
         "SELECT fecha, entrada, salida, horas FROM horarios ORDER BY fecha"
     ).fetchall()
     con.close()
 
-    return render_template("index.html", datos=datos)
+    # Calcular total mensual
+    total_horas = sum(h for _, _, _, h in datos)
+
+    return render_template(
+        "index.html",
+        datos=datos,
+        total_horas=total_horas
+    )
 
 
 if __name__ == "__main__":
